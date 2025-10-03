@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">PomodoroApp</string>
+    <string name="Pomodoro">PomodoroApp</string>
+    <string name="symbol_play">&#x25B6;</string>
+    <string name="symbol_pause">&#x275A;&#x275A;</string>
 </resources>
