@@ -1,18 +1,22 @@
 package com.example.pomodoroapp
 
+import android.content.Context
 import android.content.res.ColorStateList
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import com.google.android.material.chip.ChipGroup
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
 
     private enum class TimerState {
         WORK, SHORT_BREAK, LONG_BREAK
@@ -22,6 +26,8 @@ class MainActivity : ComponentActivity() {
     private lateinit var resetButton: ImageButton
     private lateinit var circularProgressBar: ProgressBar
     private lateinit var timeChipGroup: ChipGroup
+    private lateinit var themeIcon: ImageView
+
 
     private var countDownTimer: CountDownTimer? = null
     private var isTimerRunning = false
@@ -35,6 +41,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        applySavedTheme()
         setContentView(R.layout.activity_main)
 
         timerTextView = findViewById(R.id.timerTextView)
@@ -42,11 +49,46 @@ class MainActivity : ComponentActivity() {
         resetButton = findViewById(R.id.resetButton)
         circularProgressBar = findViewById(R.id.circularProgressBar)
         timeChipGroup = findViewById(R.id.timeChipGroup)
+        themeIcon = findViewById(R.id.ThemeIcon)
 
         setupChipListener()
         setupButtonListeners()
+        setupThemeToggle()
 
         updateUIToCurrentState() // Configura a UI inicial
+    }
+
+    private fun applySavedTheme() {
+        val sharedPreferences = getSharedPreferences("ThemePrefs", Context.MODE_PRIVATE)
+        val isNightMode = sharedPreferences.getBoolean("isNightMode", false)
+        if (isNightMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
+    }
+
+    private fun setupThemeToggle() {
+        themeIcon.setOnClickListener {
+            val currentNightMode = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+            val newMode: Int
+            val isNightMode: Boolean
+
+            if (currentNightMode == android.content.res.Configuration.UI_MODE_NIGHT_YES) {
+                newMode = AppCompatDelegate.MODE_NIGHT_NO
+                isNightMode = false
+            } else {
+                newMode = AppCompatDelegate.MODE_NIGHT_YES
+                isNightMode = true
+            }
+
+            AppCompatDelegate.setDefaultNightMode(newMode)
+            val sharedPreferences = getSharedPreferences("ThemePrefs", Context.MODE_PRIVATE)
+            with(sharedPreferences.edit()) {
+                putBoolean("isNightMode", isNightMode)
+                apply()
+            }
+        }
     }
 
     private fun setupChipListener() {
@@ -147,11 +189,22 @@ class MainActivity : ComponentActivity() {
         updateTimerText()
         updateProgressBar()
 
+        val isNightMode = (resources.configuration.uiMode and
+                android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
+                android.content.res.Configuration.UI_MODE_NIGHT_YES
+
         val colorRes = when (currentState) {
-            TimerState.WORK -> R.color.pomodoro_running_light
-            TimerState.SHORT_BREAK -> R.color.pomodoro_short_break_light
-            TimerState.LONG_BREAK -> R.color.pomodoro_long_break_light
+            TimerState.WORK -> {
+                if (isNightMode) R.color.pomodoro_running_night else R.color.pomodoro_running_light
+            }
+            TimerState.SHORT_BREAK -> {
+                if (isNightMode) R.color.pomodoro_short_break_night else R.color.pomodoro_short_break_light
+            }
+            TimerState.LONG_BREAK -> {
+                if (isNightMode) R.color.pomodoro_long_break_night else R.color.pomodoro_long_break_light
+            }
         }
+
         val color = ContextCompat.getColor(this, colorRes)
 
         circularProgressBar.progressTintList = ColorStateList.valueOf(color)
