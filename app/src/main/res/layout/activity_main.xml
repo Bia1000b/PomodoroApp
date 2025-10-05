@@ -9,7 +9,6 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/screen_background"
     tools:context=".MainActivity">
 
     <TextView
@@ -19,7 +18,6 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="24dp"
         android:text="@string/Pomodoro"
-        android:textColor="@color/primary_text"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -52,8 +50,6 @@
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
-            android:backgroundTint="@color/main_break_light_color"
             android:text="25 / 5"
             android:checked="true"/>
 
@@ -92,7 +88,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="25:00"
-        android:textColor="@color/primary_text"
         android:textSize="60sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/circularProgressBar"
@@ -135,9 +130,7 @@
         android:layout_marginTop="20dp"
         android:paddingVertical="16dp"
         android:text="Adicionar tarefa"
-        android:textColor="@color/primary_text"
         app:cornerRadius="16dp"
-        android:backgroundTint="@color/main_break_light_color"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/controlsContainer" />
@@ -157,7 +150,6 @@
             android:layout_height="wrap_content"
             android:text="task_1"
             android:textSize="16sp"
-            android:buttonTint="@color/main_break_light_color"
             android:checked="true"/>
 
         <CheckBox

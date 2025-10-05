@@ -3,8 +3,23 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="screen_background">#FFFFFF</color>
-    <color name="primary_text">#121212</color>
-    <color name="progress_bar_background_color">#E0E0E0</color>
-    <color name="main_break_light_color">#87CEEB</color>
+    <color name="screen_background_light">#F8F8F8</color>
+    <color name="primary_text_light">#121212</color>
+    <color name="progress_bar_background_color_light">#E0E0E0</color>
+
+    <color name="pomodoro_primary_light">#87CEEB</color>
+    <color name="pomodoro_running_light">#4682B4</color>
+    <color name="pomodoro_short_break_light">#5F9EA0</color>
+    <color name="pomodoro_long_break_light">#66CDAA</color>
+
+    <color name="screen_background_night">#121212</color>
+    <color name="primary_text_night">#E0E0E0</color>
+    <color name="progress_bar_background_color_night">#3A3A3A</color>
+
+    <color name="pomodoro_primary_night">#5C9EAD</color>
+    <color name="pomodoro_running_night">#4A7F9E</color>
+    <color name="pomodoro_short_break_night">#4E8B8B</color>
+    <color name="pomodoro_long_break_night">#57A68A</color>
+
+
 </resources>
