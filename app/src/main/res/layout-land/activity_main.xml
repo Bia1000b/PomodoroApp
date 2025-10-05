@@ -104,7 +104,7 @@
         app:layout_constraintStart_toEndOf="@+id/circularProgressBar"
         app:layout_constraintTop_toTopOf="@+id/circularProgressBar">
 
-        <ImageButton
+        <Button
             android:id="@+id/playButton"
             android:layout_width="64dp"
             android:layout_height="64dp"
