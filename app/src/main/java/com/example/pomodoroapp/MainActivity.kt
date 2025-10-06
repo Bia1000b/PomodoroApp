@@ -1,15 +1,20 @@
 package com.example.pomodoroapp
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.widget.Button
+import android.widget.CheckBox
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -21,12 +26,19 @@ class MainActivity : AppCompatActivity() {
     private enum class TimerState {
         WORK, SHORT_BREAK, LONG_BREAK
     }
+
     private lateinit var timerTextView: TextView
     private lateinit var playPauseButton: Button
     private lateinit var resetButton: ImageButton
     private lateinit var circularProgressBar: ProgressBar
     private lateinit var timeChipGroup: ChipGroup
     private lateinit var themeIcon: ImageView
+    private lateinit var addTaskButton: com.google.android.material.button.MaterialButton
+    private lateinit var tasksContainer: LinearLayout
+    private val TASKS_PREF = "tasks_pref"
+    private val TASKS_KEY = "tasks_key"
+    private lateinit var sharedPreferences: SharedPreferences
+    private val tasksList = mutableListOf<String>()
 
 
     private var countDownTimer: CountDownTimer? = null
@@ -50,12 +62,25 @@ class MainActivity : AppCompatActivity() {
         circularProgressBar = findViewById(R.id.circularProgressBar)
         timeChipGroup = findViewById(R.id.timeChipGroup)
         themeIcon = findViewById(R.id.ThemeIcon)
+        addTaskButton = findViewById(R.id.addTaskButton)
+        tasksContainer = findViewById(R.id.tasksContainer)
+        sharedPreferences = getSharedPreferences(TASKS_PREF, Context.MODE_PRIVATE)
+        loadTasks()
 
         setupChipListener()
         setupButtonListeners()
         setupThemeToggle()
 
         updateUIToCurrentState() // Configura a UI inicial
+        addTaskButton.setOnClickListener {
+            showAddTaskDialog()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        countDownTimer?.cancel()
+        countDownTimer = null
     }
 
     private fun applySavedTheme() {
@@ -70,7 +95,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupThemeToggle() {
         themeIcon.setOnClickListener {
-            val currentNightMode = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+            val currentNightMode =
+                resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
             val newMode: Int
             val isNightMode: Boolean
 
@@ -102,15 +128,15 @@ class MainActivity : AppCompatActivity() {
                     workTimeInMillis = 25 * 1000L // * 60
                     shortBreakTimeInMillis = 5 * 1000L // * 60
                 }
+
                 R.id.chip_50_10 -> {
                     workTimeInMillis = 50 * 1000L // * 60
                     shortBreakTimeInMillis = 10 * 1000L // * 60
+                    longBreakTimeInMillis = 30 * 1000L // * 60
                 }
+
                 R.id.chip_personalizado -> {
-                    // ADD DIALOG P PERSONALIZAR
-                    // POR ENQUANTO COLOQUEI ISSO
-                    workTimeInMillis = 10 * 1000L // * 60
-                    shortBreakTimeInMillis = 2 * 1000L // * 60
+                    showCustomTimeDialog()
                 }
             }
             resetTimer()
@@ -141,6 +167,7 @@ class MainActivity : AppCompatActivity() {
                     TimerState.SHORT_BREAK
                 }
             }
+
             TimerState.SHORT_BREAK, TimerState.LONG_BREAK -> {
                 currentState = TimerState.WORK
             }
@@ -197,9 +224,11 @@ class MainActivity : AppCompatActivity() {
             TimerState.WORK -> {
                 if (isNightMode) R.color.pomodoro_running_night else R.color.pomodoro_running_light
             }
+
             TimerState.SHORT_BREAK -> {
                 if (isNightMode) R.color.pomodoro_short_break_night else R.color.pomodoro_short_break_light
             }
+
             TimerState.LONG_BREAK -> {
                 if (isNightMode) R.color.pomodoro_long_break_night else R.color.pomodoro_long_break_light
             }
@@ -209,6 +238,12 @@ class MainActivity : AppCompatActivity() {
 
         circularProgressBar.progressTintList = ColorStateList.valueOf(color)
         playPauseButton.backgroundTintList = ColorStateList.valueOf(color)
+
+        if (isTimerRunning) {
+            playPauseButton.text = getString(R.string.symbol_pause)
+        } else {
+            playPauseButton.text = getString(R.string.symbol_play)
+        }
     }
 
     private fun updateTimerText() {
@@ -236,5 +271,87 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    private fun saveTasks() {
+        val set = tasksList.toSet()
+        sharedPreferences.edit().putStringSet(TASKS_KEY, set).apply()
+    }
+
+    private fun addTask(title: String) {
+        tasksList.add(title)
+        saveTasks()
+        createTaskView(title)
+    }
+
+    private fun showAddTaskDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_add_task, null)
+        val inputTaskName: EditText = dialogView.findViewById(R.id.inputTaskName)
+
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setPositiveButton("Adicionar") { _, _ ->
+                val taskTitle = inputTaskName.text.toString().trim()
+                if (taskTitle.isEmpty()) {
+                    Toast.makeText(this, "O título não pode estar vazio", Toast.LENGTH_SHORT).show()
+                } else {
+                    addTask(taskTitle)
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .create()
+
+        dialog.show()
+    }
+
+    private fun loadTasks() {
+        val savedTasks = sharedPreferences.getStringSet(TASKS_KEY, emptySet()) ?: emptySet()
+        tasksList.clear()
+        tasksList.addAll(savedTasks)
+        tasksContainer.removeAllViews()
+        for (task in tasksList) {
+            createTaskView(task)
+        }
+    }
+
+    private fun createTaskView(title: String) {
+        val checkBox = CheckBox(this)
+        checkBox.text = title
+        checkBox.textSize = 16f
+        checkBox.setPadding(0, 8, 0, 8)
+        tasksContainer.addView(checkBox)
+    }
+
+    private fun showCustomTimeDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_custom_time, null)
+        val workTimeInput: EditText = dialogView.findViewById(R.id.workTimeInput)
+        val shortBreakInput: EditText = dialogView.findViewById(R.id.shortBreakInput)
+        val longBreakInput: EditText = dialogView.findViewById(R.id.longBreakInput)
+
+        workTimeInput.setText((workTimeInMillis / 1000).toString())
+        shortBreakInput.setText((shortBreakTimeInMillis / 1000).toString())
+        longBreakInput.setText((longBreakTimeInMillis / 1000).toString())
+
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Tempo Personalizado")
+            .setView(dialogView)
+            .setPositiveButton("Salvar") { _, _ ->
+                val work = workTimeInput.text.toString().toLongOrNull()
+                val shortBreak = shortBreakInput.text.toString().toLongOrNull()
+                val longBreak = longBreakInput.text.toString().toLongOrNull()
+
+                if (work != null && shortBreak != null && longBreak != null) {
+                    workTimeInMillis = work * 1000 //* 60
+                    shortBreakTimeInMillis = shortBreak * 1000 //* 60
+                    longBreakTimeInMillis = longBreak * 1000 //* 60
+                    resetTimer()
+                } else {
+                    Toast.makeText(this, "Digite valores válidos", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .create()
+
+        dialog.show()
     }
 }

@@ -21,5 +21,11 @@
     <color name="pomodoro_short_break_night">#4E8B8B</color>
     <color name="pomodoro_long_break_night">#57A68A</color>
 
+    <color name="dialog_background">#FFFFFF</color>
+    <color name="dialog_title_text">#212121</color>
+    <color name="dialog_input_text">#212121</color>
+    <color name="dialog_input_hint">#757575</color>
+    <color name="dialog_input_border">#BDBDBD</color>
+
 
 </resources>

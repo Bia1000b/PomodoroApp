@@ -1,9 +1,11 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Base.Theme.PomodoroApp" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.PomodoroApp" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/pomodoro_primary_light</item>
         <item name="colorOnPrimary">@color/white</item>
         <item name="colorSecondary">@color/pomodoro_running_light</item>
         <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSurface">@color/screen_background_light</item>
+        <item name="colorOnSurface">@color/primary_text_light</item>
 
         <item name="android:statusBarColor">@color/screen_background_light</item>
         <item name="android:windowLightStatusBar">true</item>
@@ -11,6 +13,4 @@
         <item name="android:windowBackground">@color/screen_background_light</item>
         <item name="android:textColor">@color/primary_text_light</item>
     </style>
-
-    <style name="Theme.PomodoroApp" parent="Base.Theme.PomodoroApp" />
 </resources>
