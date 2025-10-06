@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dialogContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/bg_dialog_rounded">
+
+    <TextView
+        android:id="@+id/dialogTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nova Tarefa"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/dialog_title_text"
+        android:layout_gravity="center_horizontal"/>
+
+    <EditText
+        android:id="@+id/inputTaskName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Digite o nome da tarefa"
+        android:textColorHint="@color/dialog_input_hint"
+        android:textColor="@color/dialog_input_text"
+        android:padding="12dp"
+        android:background="@drawable/bg_edittext_rounded"
+        android:textSize="16sp"/>
+</LinearLayout>
